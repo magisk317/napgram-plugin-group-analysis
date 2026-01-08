@@ -5,6 +5,16 @@
   "name": "群组分析",
   "description": "群聊数据分析插件，支持多维度统计、智能话题总结、用户称号分析和金句提取",
   "entry": "dist/index.mjs",
+  "permissions": {
+    "instances": [
+      "qq",
+      "tg"
+    ],
+    "network": [
+      "fetch"
+    ],
+    "fs": []
+  },
   "config": {
     "llm": {
       "baseUrl": {
