@@ -1,233 +1,129 @@
-# napgram-plugin-template
+# napgram-plugin-group-analysis
 
-NapGram 原生插件模板仓库（可作为 GitHub **Template repository** 使用）。
+NapGram 群聊分析插件，支持多维度统计、智能话题总结、用户称号分析和金句提取。
 
-这是 **NapGram 原生插件** 模板：插件直接运行在 NapGram 进程内，通过原生 API 访问平台功能。
+## 功能特性
 
-## 特点
+- ✅ **多维度统计** - 总消息数、参与人数、总字数、表情统计
+- ✅ **活跃时段分析** - 识别群聊最活跃的时间段
+- ✅ **用户发言排行** - 统计最活跃用户及其发言习惯
+- ✅ **AI 话题总结** - 使用大语言模型自动提取核心讨论话题
+- ✅ **用户称号分析** - 为活跃用户生成个性化称号和 MBTI 类型
+- ✅ **金句提取** - 自动挑选群聊中最具冲击力的"逆天"发言
 
-- ✅ **原生集成** - 直接运行在 NapGram 进程内，无需独立进程
-- ✅ **类型安全** - 直接依赖 `@napgram/sdk` 类型，开箱即用
-- ✅ **高性能** - 内存级事件通信，零延迟
-- ✅ **简单易用** - 清晰的 API，开箱即用
+## 安装方法
 
-## 快速开始
-
-### 0) 使用模板创建仓库
-
-1. 打开本仓库，点击 **Use this template** 创建新仓库
-2. 克隆新仓库到本地
-3. 修改 `napgram-plugin.json`（id/name/description）
-4. 修改 `package.json`（name/version/description）
-
-### 1) 安装依赖
+### 1. 构建插件
 
 ```bash
+cd /path/to/napgram-plugin-group-analysis
 pnpm install
-```
-
-### 2) 开发插件
-
-编辑 `src/index.ts`，实现你的插件逻辑：
-
-```typescript
-import { definePlugin } from '@napgram/sdk';
-
-const plugin = definePlugin({
-  id: 'my-plugin',
-  name: 'My Plugin',
-  version: '1.0.0',
-  
-  async install(ctx) {
-    ctx.on('message', async (event) => {
-      if (event.message.text === 'ping') await event.reply('pong');
-    });
-  }
-});
-
-export default plugin;
-```
-
-
-
-### 3) 构建
-
-```bash
 pnpm build
 ```
 
-### 3.1) 本地安装（可选）
+### 2. 安装到 NapGram
 
-将构建产物安装到 NapGram 的 data 目录（无需改 `plugins.yaml`）：
+将构建产物安装到 NapGram 数据目录：
 
 ```bash
 ./scripts/install-local.sh /path/to/napgram/data
 ```
 
-重载方式（二选一）：
+### 3. 配置插件
 
-- 重启 NapGram
-- `POST /api/admin/plugins/reload`（全量重载）或 `POST /api/admin/plugins/:id/reload`（单插件重载）
+在 NapGram Web UI 中配置以下必填项：
 
-### 4) 打包发布
+- **LLM Token**: OpenAI 兼容接口的访问令牌（必填）
+- **LLM Base URL**: API 地址，默认 `https://api.openai.com/v1`
+- **允许的群组**: 可以使用插件的群组 ID 列表（留空表示全部允许）
 
-```bash
-# 打包为 zip
-pnpm pack:zip
+## 使用方法
 
-# 打包为 tgz
-pnpm pack:tgz
-
-# 生成 marketplace 索引片段
-pnpm marketplace:snippet
-```
-
-产物位于 `release/` 目录。
-
-## 插件 API
-
-### 核心接口
-
-- **PluginContext** - 插件上下文，提供所有 API
-- **MessageEvent** - 消息事件
-- **MessageAPI** - 发送/撤回消息
-- **InstanceAPI** - 实例管理
-- **UserAPI** - 用户信息
-- **GroupAPI** - 群组管理
-- **PluginStorage** - 数据存储
-- **PluginLogger** - 日志记录
-
-### 事件监听
-
-```typescript
-ctx.on('message', async (event) => {
-  // 处理消息
-});
-
-ctx.on('friend-request', async (event) => {
-  // 处理好友请求
-});
-```
-
-### 消息发送
-
-```typescript
-// 回复消息
-await event.reply('Hello!');
-
-// 发送消息
-await event.send([
-  { type: 'text', data: { text: 'Hello ' } },
-  { type: 'at', data: { userId: 'user123' } }
-]);
-```
-
-### 数据存储
-
-```typescript
-// 保存数据
-await ctx.storage.set('key', { data: 'value' });
-
-// 读取数据
-const data = await ctx.storage.get('key');
-
-// 删除数据
-await ctx.storage.delete('key');
-```
-
-### 数据库 Schema（可选）
-
-如果需要使用数据库存储结构化数据，在 `src/schema.ts` 中定义 Drizzle ORM schema：
-
-```typescript
-import { pgSchema, serial, text, integer } from 'drizzle-orm/pg-core';
-
-export const mySchema = pgSchema('my_plugin');
-
-export const users = mySchema.table('my_plugin_users', {
-    id: serial('id').primaryKey(),
-    userId: text('userId').notNull(),
-    coins: integer('coins').default(0).notNull(),
-});
-```
-
-在插件中使用：
-
-```typescript
-import { users } from './schema';
-import { eq } from 'drizzle-orm';
-
-// 查询
-const user = await ctx.database.select()
-    .from(users)
-    .where(eq(users.userId, 'user123'))
-    .limit(1);
-
-// 插入
-await ctx.database.insert(users).values({
-    userId: 'user123',
-    coins: 100,
-});
-```
-
-详见 [`docs/DATABASE_SCHEMA.md`](docs/DATABASE_SCHEMA.md)。
-
-### 日志记录
-
-```typescript
-ctx.logger.info('插件已启动');
-ctx.logger.debug('调试信息');
-ctx.logger.warn('警告信息');
-ctx.logger.error('错误信息');
-```
-
-## 目录结构
+### 基本命令
 
 ```
-napgram-plugin-template/
-├── src/
-│   ├── index.ts              # 插件主文件
-│   └── schema.ts             # 数据库 schema（可选）
-├── docs/
-│   └── DATABASE_SCHEMA.md    # 数据库 schema 开发指南
-├── scripts/
-│   ├── pack.mjs              # 打包脚本
-│   ├── marketplace-snippet.mjs
-│   └── marketplace-upsert.mjs
-├── napgram-plugin.json       # 插件元信息
-├── package.json
-├── tsconfig.json
-└── README.md
+群分析          # 分析最近 1 天的群聊记录
+群分析 --天数 3  # 分析最近 3 天的群聊记录
 ```
 
-## 发布到 Marketplace
+### 配置说明
 
-1. 打包插件：`pnpm pack:zip`
-2. 上传到 GitHub Release 或 CDN
-3. 生成索引片段：`pnpm marketplace:snippet`
-4. 提交 PR 到 NapGram Marketplace 仓库
+#### LLM 配置
+- `llm.baseUrl`: OpenAI 兼容接口地址
+- `llm.token`: API 访问令牌
+- `llm.model`: 模型名称（留空自动选择）
+- `llm.temperature`: 生成温度（0-2，默认 1.5）
 
-### 自动化发布（推荐）
+#### 分析配置
+- `analysis.maxMessages`: 单次分析最大消息数（默认 2000）
+- `analysis.minMessages`: 最小消息数要求（默认 100）
+- `analysis.maxTopics`: 最多生成话题数（默认 5）
+- `analysis.maxUserTitles`: 最多生成用户称号数（默认 6）
+- `analysis.maxGoldenQuotes`: 最多生成金句数（默认 3）
 
-推送 tag 后 Release workflow 会自动：
-1. 打包产物并生成 `marketplace-index-snippet.json`
-2. 若配置了 `MARKETPLACE_PR_TOKEN`，自动向 **NapGram/marketplace** 提交 PR（请关注 `https://github.com/NapGram/marketplace/pulls`）
+#### 输出配置
+- `output.format`: 输出格式（text/image/pdf）
+  - **text** - 纯文本报告
+  - **image** - 图片报告（使用 Canvas 渲染，Material Design 3 风格）
+  - **pdf** - PDF 报告（开发中）
+- `output.theme`: 主题（light/dark/auto）
+- `output.skin`: 皮肤（md3/anime/guofeng，当前仅支持 md3）
 
-需要在**实际插件仓库**配置以下 Secrets：
-- `NPM_TOKEN`：npm automation token（用于 publish）
-- `MARKETPLACE_PR_TOKEN`：GitHub PAT（需要 **repo** + **workflow** 权限）
+### 过滤设置
+- `wordsFilter`: 过滤词列表，包含这些词的消息将被忽略
+- `userFilter`: 过滤用户列表，这些用户的消息将被忽略
 
-`MARKETPLACE_PR_TOKEN` 权限建议（fine-grained）：
-- Repository access：选择你的插件仓库
-- Permissions：Contents（read/write）、Pull requests（read/write）、Workflows（read/write）
+## 技术说明
 
-可选配置：
-- `MARKETPLACE_DIST_HOST`：自定义资源下载域名，未设置时默认使用 GitHub Release 下载链接
+### 架构
 
-## 示例插件
+插件采用模块化设计：
 
-查看 `src/index.ts` 中的 Ping Pong 插件示例。
+- **src/index.ts** - 插件入口，命令注册
+- **src/services/analysis.ts** - 核心分析服务
+- **src/services/llm.ts** - LLM 调用服务
+- **src/services/storage.ts** - 消息存储服务
+- **src/services/renderer.ts** - Canvas 图片渲染
+- **src/utils.ts** - 统计计算工具函数
+- **src/config.ts** - 配置定义和验证
+- **src/types.ts** - TypeScript 类型定义
+- **src/schema.ts** - Drizzle ORM 数据库 Schema
 
-## License
+### 消息获取
+
+插件通过 NapGram SDK 的 API 获取历史消息，无需数据库持久化。支持：
+- Telegram（通过 mtproto API）
+- QQ（通过 NapCat API）
+
+### LLM 集成
+
+使用 OpenAI 兼容接口，支持：
+- OpenAI GPT 系列
+- 其他兼容 API（Qwen、GLM、Moonshot、DeepSeek、Claude 等）
+
+Prompt 模板可在配置中自定义。
+
+## 开发计划
+
+### 当前版本 (v0.1.0)
+- ✅ 群组消息统计
+- ✅ 数据库消息存储
+- ✅ 话题总结
+- ✅ 用户称号分析  
+- ✅ 金句提取
+- ✅ 文本报告输出
+- ✅ 图片报告渲染（Canvas + MD3 风格）
+
+### 未来版本
+- ⏳ 更多图片模板（anime、guofeng 风格）
+- ⏳ PDF 报告导出
+- ⏳ 定时任务支持
+- ⏳ 跨群用户画像分析
+
+## 许可证
 
 MIT
+
+## 致谢
+
+本插件基于 [koishi-plugin-group-analysis](https://github.com/magisk317/group-analysis) 重写为 NapGram 版本。感谢原作者的贡献！

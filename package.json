@@ -1,8 +1,8 @@
 {
-  "name": "napgram-plugin-template",
+  "name": "napgram-plugin-group-analysis",
   "private": true,
-  "version": "0.1.0",
-  "description": "NapGram native plugin template (runs directly in NapGram runtime).",
+  "version": "0.0.1",
+  "description": "NapGram 群聊分析插件，支持多维度统计、智能话题总结、用户称号分析和金句提取",
   "type": "module",
   "packageManager": "pnpm@10.27.0",
   "scripts": {
@@ -15,11 +15,14 @@
     "marketplace:snippet": "node scripts/marketplace-snippet.mjs"
   },
   "dependencies": {
-    "@napgram/sdk": "^0.1.6",
-    "drizzle-orm": "^0.45.1"
+    "@napgram/sdk": "^0.1.9",
+    "js-yaml": "^4.1.0",
+    "drizzle-orm": "^0.45.1",
+    "@napi-rs/canvas": "^0.1.58"
   },
   "devDependencies": {
     "@types/node": "^25.0.3",
+    "@types/js-yaml": "^4.0.9",
     "typescript": "^5.9.3"
   }
 }

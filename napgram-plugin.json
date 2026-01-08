@@ -1,8 +1,116 @@
 {
   "schemaVersion": 1,
   "kind": "native",
-  "id": "ping-pong",
-  "name": "Ping Pong Plugin (Template)",
-  "description": "A native NapGram plugin example that replies pong to ping.",
-  "entry": "dist/index.mjs"
+  "id": "group-analysis",
+  "name": "群组分析",
+  "description": "群聊数据分析插件，支持多维度统计、智能话题总结、用户称号分析和金句提取",
+  "entry": "dist/index.mjs",
+  "config": {
+    "llm": {
+      "baseUrl": {
+        "type": "string",
+        "default": "https://api.openai.com/v1",
+        "description": "OpenAI 兼容接口地址"
+      },
+      "token": {
+        "type": "string",
+        "required": true,
+        "secret": true,
+        "description": "API 访问令牌"
+      },
+      "model": {
+        "type": "string",
+        "description": "模型名称（留空则自动选择）"
+      },
+      "temperature": {
+        "type": "number",
+        "default": 1.5,
+        "min": 0,
+        "max": 2,
+        "description": "生成温度"
+      }
+    },
+    "allowedGroups": {
+      "type": "array",
+      "items": "string",
+      "default": [],
+      "description": "允许使用的群组 ID 列表（留空表示全部允许）"
+    },
+    "analysis": {
+      "maxMessages": {
+        "type": "number",
+        "default": 2000,
+        "description": "单次分析的最大消息数"
+      },
+      "minMessages": {
+        "type": "number",
+        "default": 100,
+        "description": "进行分析所需的最小消息数"
+      },
+      "maxUsersInReport": {
+        "type": "number",
+        "default": 10,
+        "description": "报告中显示的最大用户数"
+      },
+      "maxTopics": {
+        "type": "number",
+        "default": 5,
+        "description": "最多生成的话题数"
+      },
+      "maxUserTitles": {
+        "type": "number",
+        "default": 6,
+        "description": "最多生成的用户称号数"
+      },
+      "maxGoldenQuotes": {
+        "type": "number",
+        "default": 3,
+        "description": "最多生成的金句数"
+      }
+    },
+    "output": {
+      "format": {
+        "type": "enum",
+        "enum": [
+          "image",
+          "pdf",
+          "text"
+        ],
+        "default": "text",
+        "description": "输出格式"
+      },
+      "theme": {
+        "type": "enum",
+        "enum": [
+          "light",
+          "dark",
+          "auto"
+        ],
+        "default": "auto",
+        "description": "主题"
+      },
+      "skin": {
+        "type": "enum",
+        "enum": [
+          "md3",
+          "anime",
+          "guofeng"
+        ],
+        "default": "md3",
+        "description": "皮肤"
+      }
+    },
+    "wordsFilter": {
+      "type": "array",
+      "items": "string",
+      "default": [],
+      "description": "过滤词列表"
+    },
+    "userFilter": {
+      "type": "array",
+      "items": "string",
+      "default": [],
+      "description": "过滤用户 ID 列表"
+    }
+  }
 }

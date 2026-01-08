@@ -1,41 +1,58 @@
-import { definePlugin } from '@napgram/sdk';
-
 /**
- * Ping Pong 插件
- *
- * 原生 NapGram 插件示例：收到 "ping" 回复 "pong"
+ * NapGram 群组分析插件
  */
+
+import { definePlugin, createCommand } from '@napgram/sdk';
+import { GroupAnalysisService } from './services/analysis';
+import { validateConfig } from './config';
+import type { PluginConfig } from './types';
+
 const plugin = definePlugin({
-  // 插件元信息
-  id: 'ping-pong',
-  name: 'Ping Pong Plugin (Template)',
+  id: 'group-analysis',
+  name: '群组分析',
   version: '0.1.0',
-  author: 'NapLink',
-  description: 'A native NapGram plugin example that replies pong to ping.',
+  description: '群聊数据分析插件，支持多维度统计、智能话题总结、用户称号分析和金句提取',
 
-  // 插件安装
-  async install(ctx) {
-    ctx.logger.info('Ping Pong plugin installed');
+  async install(ctx, config) {
+    // 验证配置
+    let validatedConfig: PluginConfig;
+    try {
+      validatedConfig = validateConfig(config as Partial<PluginConfig>);
+    } catch (error) {
+      ctx.logger.error('配置验证失败:', error);
+      throw error;
+    }
 
-    // 监听消息事件
-    ctx.on('message', async (event) => {
-      const text = (event.message.text || '').toLowerCase().trim();
+    ctx.logger.info('群组分析插件已加载');
 
-      // 匹配 "ping" 或 "/ping"
-      if (text === 'ping' || text === '/ping') {
-        // 回复消息
-        await event.reply('pong');
+    // 创建分析服务
+    const analysisService = new GroupAnalysisService(ctx, validatedConfig);
 
-        ctx.logger.info(`Replied to ${event.sender.userName} in ${event.channelId}`);
+    // 注册命令
+    const groupAnalysisCommand = createCommand({
+      name: '群分析',
+      description: '分析群聊记录',
+      handler: async (event, args) => {
+        // 解析参数
+        let days = 1;
+        if (args.length > 0) {
+          const parsed = parseInt(args[0]);
+          if (!isNaN(parsed) && parsed > 0) {
+            days = Math.min(parsed, 30); // 最多30天
+          }
+        }
+
+        await analysisService.executeGroupAnalysis(event, days);
       }
     });
 
-    // 注册卸载钩子
-    ctx.onUnload(() => {
-      ctx.logger.info('Ping Pong plugin unloaded');
-    });
+    ctx.command(groupAnalysisCommand);
+    ctx.logger.info('群分析命令已注册');
   },
+
+  async uninstall() {
+    // 清理资源（如有）
+  }
 });
 
-// 导出插件（默认导出）
 export default plugin;
