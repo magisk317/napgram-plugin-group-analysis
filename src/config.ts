@@ -2,7 +2,7 @@
  * 群组分析插件配置定义
  */
 
-import { PluginConfig } from './types';
+import { PluginConfig } from './types.js';
 
 /**
  * 默认配置

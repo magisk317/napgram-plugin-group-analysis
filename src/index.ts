@@ -3,9 +3,9 @@
  */
 
 import { definePlugin, createCommand } from '@napgram/sdk';
-import { GroupAnalysisService } from './services/analysis';
-import { validateConfig } from './config';
-import type { PluginConfig } from './types';
+import { GroupAnalysisService } from './services/analysis.js';
+import { validateConfig } from './config.js';
+import type { PluginConfig } from './types.js';
 
 const plugin = definePlugin({
   id: 'group-analysis',

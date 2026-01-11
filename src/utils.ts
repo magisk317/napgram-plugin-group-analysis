@@ -2,7 +2,7 @@
  * 工具函数
  */
 
-import { BasicStatsResult, GroupAnalysisResult, StoredMessage, UserStats } from './types';
+import { BasicStatsResult, GroupAnalysisResult, StoredMessage, UserStats } from './types.js';
 
 /**
  * 计算基础统计数据

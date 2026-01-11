@@ -4,9 +4,9 @@
 
 import type { PluginContext, MessageEvent } from '@napgram/sdk';
 import { PluginConfig, GroupAnalysisResult, StoredMessage } from '../types';
-import { LLMService } from './llm';
-import { MessageStorageService } from './storage';
-import { CanvasRenderer } from './renderer';
+import { LLMService } from './llm.js';
+import { MessageStorageService } from './storage.js';
+import { CanvasRenderer } from './renderer.js';
 import {
     calculateBasicStats,
     generateActiveHoursChart,
