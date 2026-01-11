@@ -1,7 +1,7 @@
 {
   "name": "napgram-plugin-group-analysis",
   "private": true,
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "NapGram 群聊分析插件，支持多维度统计、智能话题总结、用户称号分析和金句提取",
   "type": "module",
   "packageManager": "pnpm@10.27.0",
