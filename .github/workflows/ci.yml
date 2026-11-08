@@ -1,9 +1,10 @@
 name: CI
 
+# Manual verification only: GitLab is the authoritative CI gate for this repo
+# (toolkit /.gitlab/ci/napgram-plugin.yml). Keep this workflow runnable for
+# cross-checking via workflow_dispatch; it must not auto-run on push/PR.
 on:
-  push:
-    branches: ["main", "dev"]
-  pull_request:
+  workflow_dispatch:
 
 jobs:
   typecheck:
